@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 对话助手</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; }
+        #chat-box { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
+        .msg { margin: 5px 0; }
+        .user { color: blue; }
+        .ai { color: green; }
+        input { width: 80%; padding: 8px; }
+        button { padding: 8px 16px; }
+    </style>
+</head>
+<body>
+<h2>AI 对话助手</h2>
+<div id="chat-box"></div>
+<input id="input" placeholder="输入消息，回车发送..." onkeydown="if(event.key==='Enter') send()">
+<button onclick="send()">发送</button>
+
+<script>
+    async function send() {
+        const input = document.getElementById('input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+
+        const box = document.getElementById('chat-box');
+        box.innerHTML += `<div class="msg user"><b>你：</b>${msg}</div>`;
+        box.scrollTop = box.scrollHeight;
+
+        try {
+            const res = await fetch(`/api/chat?message=${encodeURIComponent(msg)}`);
+            const reply = await res.text();
+            box.innerHTML += `<div class="msg ai"><b>AI：</b>${reply}</div>`;
+        } catch (e) {
+            box.innerHTML += `<div class="msg ai" style="color:red;"><b>错误：</b>请求失败</div>`;
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+</script>
+</body>
+</html>
